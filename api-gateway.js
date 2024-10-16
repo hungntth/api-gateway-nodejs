@@ -1,28 +1,31 @@
-const http = require('http');
-const { createProxyMiddleware } = require('http-proxy-middleware');
+const http = require("http");
+const { createProxyMiddleware } = require("http-proxy-middleware");
+const { startMetrics } = require("./metrics");
 
 // Define API routes and corresponding backend services
 const routes = {
-  '/hello': 'http://localhost:4004',
+  "/hello": "http://localhost:4004",
 };
 
 // Create proxy middleware
 const proxy = createProxyMiddleware({
   changeOrigin: true,
   xfwd: true,
-  pathRewrite: (path, req) => {
-    // Rewrite '/hello' to '/' so it doesn't forward '/hello'
-    return path.replace(/^\/hello/, '/');
-  },
+  // pathRewrite: (path, req) => {
+  // Rewrite '/hello' to '/' so it doesn't forward '/hello'
+  // return path.replace(/^\/hello/, "/");
+  // },
   router: (req) => {
     // Select backend server based on the requested route
-    const route = Object.keys(routes).find(r => req.url.startsWith(r));
+    const route = Object.keys(routes).find((r) => req.url.startsWith(r));
     if (route) {
       return routes[route];
     }
     return null;
   },
 });
+
+startMetrics();
 
 // Create API gateway server
 const server = http.createServer((req, res) => {
