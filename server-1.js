@@ -1,6 +1,7 @@
 const http = require("http");
 const url = require("url");
 const querystring = require("querystring");
+require('./consumer');
 
 const port = process.env.PORT || 3001;
 
